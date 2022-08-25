@@ -2,14 +2,14 @@
 
 import inflect
 import re
-_magnitudes = ['trillion', 'billion', 'million', 'thousand', 'hundred', 'm', 'b', 't']
-_magnitudes_key = {'m': 'million', 'b': 'billion', 't': 'trillion'}
+_magnitudes = ['trylion', 'bilion', 'milion', 'tysiąc', 'sto', 'm', 'b', 't']
+_magnitudes_key = {'m': 'milion', 'b': 'bilion', 't': 'trylion'}
 _measurements = '(f|c|k|d|m)'
 _measurements_key = {'f': 'farenhajta',
                      'c': 'celciusza',
-                     'k': 'thousand',
+                     'k': 'tysięcy',
                      'm': 'metrów'}
-_currency_key = {'$': 'dollar', '£': 'pound', '€': 'euro', '₩': 'won'}
+_currency_key = {'$': 'dolarów', '£': 'funtów', '€': 'euro', '₩': 'wonów'}
 _inflect = inflect.engine()
 _comma_number_re = re.compile(r'([0-9][0-9\,]+[0-9])')
 _decimal_number_re = re.compile(r'([0-9]+\.[0-9]+)')
@@ -26,7 +26,7 @@ def _remove_commas(m):
 
 
 def _expand_decimal_point(m):
-    return m.group(1).replace('.', ' point ')
+    return m.group(1).replace('.', ' punkt ')
 
 
 def _expand_currency(m):
@@ -52,7 +52,7 @@ def _expand_currency(m):
     cents = int(parts[1]) if len(parts) > 1 and parts[1] else 0
     if dollars and cents:
         dollar_unit = currency if dollars == 1 else currency+'s'
-        cent_unit = 'cent' if cents == 1 else 'cents'
+        cent_unit = 'cent' if cents == 1 else 'centów'
         return "{} {}, {} {}".format(
             _expand_hundreds(dollars), dollar_unit,
             _inflect.number_to_words(cents), cent_unit)
@@ -60,7 +60,7 @@ def _expand_currency(m):
         dollar_unit = currency if dollars == 1 else currency+'s'
         return "{} {}".format(_expand_hundreds(dollars), dollar_unit)
     elif cents:
-        cent_unit = 'cent' if cents == 1 else 'cents'
+        cent_unit = 'cent' if cents == 1 else 'centów'
         return "{} {}".format(_inflect.number_to_words(cents), cent_unit)
     else:
         return 'zero' + ' ' + currency + 's'
@@ -69,7 +69,7 @@ def _expand_currency(m):
 def _expand_hundreds(text):
     number = float(text)
     if number > 1000 < 10000 and (number % 100 == 0) and (number % 1000 != 0):
-        return _inflect.number_to_words(int(number / 100)) + " hundred"
+        return _inflect.number_to_words(int(number / 100)) + " sto"
     else:
         return _inflect.number_to_words(text)
 
@@ -113,14 +113,14 @@ def _expand_number(m):
     _, number, suffix = re.split(r"(\d+(?:'?\d+)?)", m.group(0))
     number = int(number)
     if number > 1000 and number < 10000 and (number % 100 == 0) and (number % 1000 != 0):
-        text = _inflect.number_to_words(number // 100) + " hundred"
+        text = _inflect.number_to_words(number // 100) + " sto"
     elif number > 1000 and number < 3000:
         if number == 2000:
-            text = 'two thousand'
+            text = 'dwa tysiące'
         elif number > 2000 and number < 2010:
-            text = 'two thousand ' + _inflect.number_to_words(number % 100)
+            text = 'dwa tysiące ' + _inflect.number_to_words(number % 100)
         elif number % 100 == 0:
-            text = _inflect.number_to_words(number // 100) + ' hundred'
+            text = _inflect.number_to_words(number // 100) + ' sto'
         else:
             number = _inflect.number_to_words(number, andword='', zero='oh', group=2).replace(', ', ' ')
             number = re.sub(r'-', ' ', number)
